@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+*.har
+/tmp/
+scripts/
+PROJECT_NOTES.md
+*.jpeg
+.ruff_cache/
