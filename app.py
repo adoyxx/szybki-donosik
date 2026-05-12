@@ -17,10 +17,10 @@ from profile_storage import Profile, load_profile, save_profile  # noqa: E402
 from violations import LABELS, build_body, build_subject, sm_category_for  # noqa: E402
 
 st.set_page_config(
-    page_title="Konfident — zgłoszenia parkowania", page_icon="🅿️", layout="centered"
+    page_title="Szybki Donosik", page_icon="🅿️", layout="centered"
 )
-st.title("🅿️ Konfident")
-st.caption("Asystent zgłoszeń złego parkowania do Straży Miejskiej w Poznaniu")
+st.title("🅿️ Szybki Donosik")
+st.caption("Zgłoś szybko i wygodnie patoparkowanie do Straży Miejskiej w Poznaniu")
 
 # ---- session state ----
 ss = st.session_state
