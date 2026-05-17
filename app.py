@@ -275,7 +275,7 @@ if st.button(
             result = sm_submit(report, dry_run=False)
 
         st.success(
-            "✅ Zgłoszenie wysłane. Sprawdź skrzynkę pocztową - przyjdzie potwierdzenie z identyfikatorem."
+            "✅ Zgłoszenie wysłane. Sprawdź skrzynkę pocztową. W ciągu kilku minut powinno przyjść potwierdzenie z identyfikatorem."
         )
         with st.expander("Szczegóły requestów"):
             for label, code, size in result["responses"]:
