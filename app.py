@@ -18,9 +18,7 @@ from profile_storage import Profile, load_profile, save_profile  # noqa: E402
 from sm_client import Report as SmReport, submit as sm_submit  # noqa: E402
 from violations import LABELS, build_body, build_subject, sm_category_for  # noqa: E402
 
-st.set_page_config(
-    page_title="Szybki Donosik", page_icon="🅿️", layout="centered"
-)
+st.set_page_config(page_title="Szybki Donosik", page_icon="🅿️", layout="centered")
 st.title("🅿️ Szybki Donosik")
 st.caption("Zgłoś szybko i wygodnie patoparkowanie do Straży Miejskiej w Poznaniu")
 
