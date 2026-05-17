@@ -42,7 +42,7 @@ def reverse_geocode(lat: float, lon: float) -> Address | None:
         )
         r.raise_for_status()
         data = r.json()
-    except requests.RequestException, ValueError:
+    except (requests.RequestException, ValueError):
         return None
 
     addr = data.get("address", {})
