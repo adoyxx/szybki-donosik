@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 from pathlib import Path
 
 import folium
@@ -14,6 +15,7 @@ from image_utils import compress_for_upload  # noqa: E402
 from llm import PhotoAnalysis, analyze_photo  # noqa: E402
 from location import reverse_geocode, wgs84_to_epsg2177  # noqa: E402
 from profile_storage import Profile, load_profile, save_profile  # noqa: E402
+from sm_client import Report as SmReport, submit as sm_submit  # noqa: E402
 from violations import LABELS, build_body, build_subject, sm_category_for  # noqa: E402
 
 st.set_page_config(
@@ -222,4 +224,64 @@ st.markdown(
 **Załącznik:** {"1 zdjęcie" if ss.image_bytes else "brak"}
 """
 )
-st.info("Integracja z formularzem SM nie jest jeszcze włączona.")
+
+
+# ---- 5. Submit ----
+st.header("5. Wysyłka do Straży Miejskiej")
+
+missing: list[str] = []
+if not ss.image_bytes:
+    missing.append("zdjęcie")
+if not ss.email:
+    missing.append("e-mail")
+if not ss.full_name:
+    missing.append("imię i nazwisko")
+if ss.lat is None or ss.lon is None:
+    missing.append("lokalizacja")
+if not ss.subject:
+    missing.append("temat")
+if not ss.body:
+    missing.append("treść")
+
+if missing:
+    st.warning(f"Uzupełnij pola: {', '.join(missing)}")
+
+if st.button(
+    "📨 Wyślij zgłoszenie",
+    type="primary",
+    width="stretch",
+    disabled=bool(missing),
+):
+    photo_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tf:
+            tf.write(ss.image_bytes)
+            photo_path = Path(tf.name)
+
+        report = SmReport(
+            category=cat,
+            subject=ss.subject,
+            body=ss.body,
+            email=ss.email,
+            full_name=ss.full_name,
+            mailing_address=ss.email,
+            lat=float(ss.lat),
+            lon=float(ss.lon),
+            photos=[photo_path],
+            wants_reply=True,
+        )
+
+        with st.spinner("Wysyłam do SM…"):
+            result = sm_submit(report, dry_run=False)
+
+        st.success(
+            "✅ Zgłoszenie wysłane. Sprawdź skrzynkę pocztową - przyjdzie potwierdzenie z identyfikatorem."
+        )
+        with st.expander("Szczegóły requestów"):
+            for label, code, size in result["responses"]:
+                st.text(f"{label:32}  HTTP {code:>3}  {size:>7} B")
+    except Exception as e:
+        st.error(f"❌ Błąd wysyłki: {type(e).__name__}: {e}")
+    finally:
+        if photo_path is not None:
+            photo_path.unlink(missing_ok=True)
